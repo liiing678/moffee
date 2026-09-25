@@ -4,6 +4,12 @@ window.addEventListener('load', function () {
         const elements = document.querySelectorAll('.auto-sizing');
 
         elements.forEach(element => {
+            // Slides handled by the paginator (or explicitly unmanaged) are
+            // not scaled.
+            const slideContainer = element.closest('.slide-container');
+            if (slideContainer && slideContainer.dataset.pagingMode && slideContainer.dataset.pagingMode !== 'scale') {
+                return;
+            }
             const container = element.parentElement;
 
             // Reset transform for real dimensions
@@ -78,7 +84,12 @@ window.addEventListener('load', function () {
 // Presentation mode
 let isPresentationMode = false;
 let currentSlide = 0;
-const slides = document.querySelectorAll('.slide-container');
+let slides = document.querySelectorAll('.slide-container');
+
+// Called by paginate.js after continuation slides are inserted.
+window.refreshSlides = function () {
+    slides = document.querySelectorAll('.slide-container');
+};
 
 function togglePresentationMode() {
     isPresentationMode = !isPresentationMode;

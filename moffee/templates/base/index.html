@@ -23,7 +23,7 @@
 
 <body>
     {% for slide in slides %}
-    <div class="slide-container">
+    <div class="slide-container" data-paging-mode="{{ slide.paging_mode }}" data-paging='{{ slide.paging }}'>
         {% set layout = slide.layout|default('content') %}
         {% with slide_number=loop.index %}
         {% include 'layouts/' + layout + '.html' %}
@@ -48,6 +48,7 @@
         }
         mermaid.initialize({ startOnLoad: true, theme: mermaid_theme });
     </script>
+    <script src="js/paginate.js"></script>
     <script src="js/main.js"></script>
     <script src="js/extension.js"></script>
 </body>

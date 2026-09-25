@@ -65,6 +65,56 @@ body{
     color: lightgray;
 }
 
+/* Pagination (paging: auto) */
+
+/* Measure real block heights instead of letting flexbox compress content */
+.slide-container[data-paging-mode="auto"] .auto-sizing > *,
+.slide-container[data-paging-mode="auto"] .chunk-paragraph > * {
+    flex-shrink: 0;
+}
+
+.slide-continued,
+.slide-continued-from {
+    position: absolute;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #999;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.slide-continued {
+    bottom: 6px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.slide-continued-from {
+    top: 6px;
+    right: 20px;
+}
+
+.slide-overflow-badge {
+    position: absolute;
+    top: 6px;
+    left: 20px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #c00;
+    background-color: rgba(204, 0, 0, 0.08);
+    border: 1px solid #c00;
+    border-radius: 4px;
+    padding: 1px 6px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.slide-container.slide-overflow .slide-content {
+    outline: 2px dashed rgba(204, 0, 0, 0.5);
+    outline-offset: -2px;
+}
+
 h1 {
     font-size: 2.2em;
     margin: 10px 0;

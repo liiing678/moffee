@@ -19,6 +19,8 @@ DEFAULT_ASPECT_RATIO = "16:9"
 DEFAULT_SLIDE_WIDTH = 720
 DEFAULT_SLIDE_HEIGHT = 405
 
+PAGING_MODES = ("scale", "auto", "none")
+
 
 @dataclass
 class PageOption:
@@ -31,6 +33,10 @@ class PageOption:
     slide_height: int = DEFAULT_SLIDE_HEIGHT
     layout: str = "content"
     resource_dir: str = "."
+    paging: str = "scale"
+    split_lists: bool = True
+    split_code: bool = False
+    split_tables: bool = False
     styles: dict = field(default_factory=dict)
 
     @property

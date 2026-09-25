@@ -1,7 +1,14 @@
 from typing import List
+import json
 import os
 from jinja2 import Environment, FileSystemLoader
-from moffee.compositor import Page, PageOption, composite, parse_frontmatter
+from moffee.compositor import (
+    PAGING_MODES,
+    Page,
+    PageOption,
+    composite,
+    parse_frontmatter,
+)
 from moffee.markdown import md
 from moffee.utils.md_helper import extract_title
 from moffee.utils.file_helper import redirect_paths, copy_assets, merge_directories
@@ -55,6 +62,24 @@ def retrieve_structure(pages: List[Page]) -> dict:
     return {"page_meta": page_meta, "headings": headings}
 
 
+def paging_config(option: PageOption) -> dict:
+    """
+    Build the client-side pagination config for a slide.
+
+    Modes:
+    - "scale": shrink overflowing content to fit (default, legacy behavior)
+    - "auto": split overflowing content into continuation slides at block boundaries
+    - "none": no overflow handling
+    """
+    mode = option.paging if option.paging in PAGING_MODES else "scale"
+    return {
+        "mode": mode,
+        "splitLists": bool(option.split_lists),
+        "splitCode": bool(option.split_code),
+        "splitTables": bool(option.split_tables),
+    }
+
+
 def render_jinja2(document: str, template_dir) -> str:
     """Run jinja2 templating to create html"""
     # Setup Jinja 2
@@ -84,6 +109,8 @@ def render_jinja2(document: str, template_dir) -> str:
                 "chunk": page.chunk,
                 "layout": page.option.layout,
                 "styles": page.option.styles,
+                "paging_mode": paging_config(page.option)["mode"],
+                "paging": json.dumps(paging_config(page.option)),
             }
             for page in pages
         ],
