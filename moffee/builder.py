@@ -84,6 +84,9 @@ def render_jinja2(document: str, template_dir) -> str:
                 "chunk": page.chunk,
                 "layout": page.option.layout,
                 "styles": page.option.styles,
+                "continues": page.continues,
+                "continued": page.continued,
+                "continued_marker": page.option.continued_marker,
             }
             for page in pages
         ],

@@ -33,6 +33,7 @@ moffee is a markdown-to-slides generator with a modular architecture:
 2. **compositor.py** - Parses markdown into Page objects with frontmatter and layout decorators
 3. **builder.py** - Orchestrates the build process and Jinja2 rendering
 4. **markdown.py** - Configures Python-Markdown with extensions
+5. **pagination.py** - Splits oversized pages at block boundaries (stdlib-only, no markdown deps)
 
 ### Key Components
 

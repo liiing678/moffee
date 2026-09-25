@@ -10,6 +10,7 @@ from moffee.utils.md_helper import (
     rm_comments,
     contains_deco,
 )
+from moffee.pagination import paginate_text
 
 # Pre-compiled regex patterns for better performance
 ASPECT_RATIO_PATTERN = re.compile(r"([0-9]+):([0-9]+)")
@@ -31,6 +32,12 @@ class PageOption:
     slide_height: int = DEFAULT_SLIDE_HEIGHT
     layout: str = "content"
     resource_dir: str = "."
+    auto_paginate: bool = True
+    page_budget: int = 12
+    split_lists: bool = True
+    split_code: bool = False
+    split_tables: bool = False
+    continued_marker: str = "→ continued"
     styles: dict = field(default_factory=dict)
 
     @property
@@ -96,6 +103,8 @@ class Page:
     h1: Optional[str] = None
     h2: Optional[str] = None
     h3: Optional[str] = None
+    continues: bool = False  # next page is a continuation of this one
+    continued: bool = False  # this page continues the previous one
 
     def __post_init__(self):
         self._preprocess()
@@ -345,6 +354,8 @@ def composite(document: str) -> List[Page]:
     # Create the last page if there's remaining content
     create_page()
 
+    pages = _apply_pagination(pages)
+
     # Process each page and choose titles
     env_h1 = env_h2 = env_h3 = None
     for page in pages:
@@ -370,3 +381,42 @@ def composite(document: str) -> List[Page]:
             page.h3 = env_h3
 
     return pages
+
+
+def _apply_pagination(pages: List[Page]) -> List[Page]:
+    """
+    Split oversized pages into multiple pages at block boundaries.
+
+    Continuation pages carry no headings of their own so they inherit
+    titles from the preceding page, and are flagged with `continued` /
+    `continues` so templates can render a footer marker.
+    """
+    result: List[Page] = []
+    for page in pages:
+        option = page.option
+        segments = []
+        if option.auto_paginate and page.raw_md.strip():
+            segments = paginate_text(
+                page.raw_md,
+                budget=option.page_budget,
+                split_lists=option.split_lists,
+                split_code=option.split_code,
+                split_tables=option.split_tables,
+                page_label=page.title or "untitled",
+            )
+        if len(segments) <= 1:
+            result.append(page)
+            continue
+        for i, segment in enumerate(segments):
+            result.append(
+                Page(
+                    raw_md=segment,
+                    option=deepcopy(option),
+                    h1=page.h1 if i == 0 else None,
+                    h2=page.h2 if i == 0 else None,
+                    h3=page.h3 if i == 0 else None,
+                    continues=i < len(segments) - 1,
+                    continued=i > 0,
+                )
+            )
+    return result

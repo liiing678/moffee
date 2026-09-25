@@ -29,5 +29,10 @@
         <div class="slide-number">
             <p>{{ slide_number }}</p>
         </div>
+        {% if slide.continues and slide.continued_marker %}
+        <div class="continued-marker">
+            <p>{{ slide.continued_marker }}</p>
+        </div>
+        {% endif %}
     </div>
 </div>

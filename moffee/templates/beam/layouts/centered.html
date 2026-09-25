@@ -38,6 +38,11 @@
     </div>
     <div class="footer">
         <p> {{ title }}</p>
+        {% if slide.continues and slide.continued_marker %}
+        <div class="continued-marker">
+            <p>{{ slide.continued_marker }}</p>
+        </div>
+        {% endif %}
         <div class="slide-number">
             <p>{{ slide_number }} / {{slides | length}}</p>
         </div>

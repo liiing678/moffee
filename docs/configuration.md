@@ -15,6 +15,12 @@ moffee's behavior can be customized using front matter at the beginning of your 
 | aspect_ratio | Aspect ratio of the slides | "16:9" | "16:9", "4:3" |
 | slide_width | Width of the slides | 720 | Any number |
 | slide_height | Height of the slides | 405 | Any number |
+| auto_paginate | Split oversized slides at block boundaries | true | true, false |
+| page_budget | Maximum estimated content lines per slide | 12 | Any number >= 4 |
+| split_lists | Allow lists to break at item boundaries | true | true, false |
+| split_code | Allow fenced code blocks to split across pages | false | true, false |
+| split_tables | Allow tables to split across pages (header repeats) | false | true, false |
+| continued_marker | Footer marker on pages that continue on the next slide | "→ continued" | Any string, "" to hide |
 
 ### Default Front Matter
 
@@ -54,4 +60,38 @@ moffee supports local style decorators for individual slides using the syntax `@
 # A refined landing page
 Our journey begins here
 @(layout=content, background-image='url("https://placehold.co/600x400")')
+```
+
+## Auto Pagination
+
+When a slide's content exceeds `page_budget` estimated lines, moffee splits it
+into multiple slides at block boundaries instead of letting it overflow or
+shrink to an unreadable size. The rules are deliberately predictable:
+
+- Content is parsed into block-level elements: paragraphs, headings, fenced
+  code blocks, tables and lists. Heights are estimated in lines (a CJK
+  character counts as two columns) and blocks are packed greedily into pages.
+- **Blocks are never split** unless you opt in: `split_lists` (default on)
+  breaks lists at item boundaries, `split_code` and `split_tables` (default
+  off) break code blocks and tables. Split tables repeat their header row,
+  and split ordered lists keep their numbering continuous across pages.
+- A block that does not fit on a page of its own and may not be split is
+  placed on a dedicated slide and moffee prints a **warning** naming the
+  page and the block, so the overflow is never silent.
+- Pages that continue on the next slide show `continued_marker` in the
+  footer; continuation slides inherit the current section titles.
+
+All options work globally in the front matter and per slide via decorators:
+
+```yaml
+---
+page_budget: 14
+split_code: true
+continued_marker: "→ continued on next page"
+---
+```
+
+```markdown
+## A slide that must stay on one page
+@(auto_paginate=false)
 ```
